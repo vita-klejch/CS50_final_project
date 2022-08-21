@@ -1,0 +1,25 @@
+{% set active_page = "connect" %} {% extends "layout.html" %} {% block title
+%}Connect{% endblock title %} {% block content %}
+<section class="container my-5">
+  <div>
+    <div class="d-sm-flex align-items-center">
+      <h3 class="mb-3 mb-md-0">Your connections:</h3>
+    </div>
+    <ul>
+      <li>jméno</li>
+      <li>jméno</li>
+      <li>jméno</li>
+    </ul>
+    <a href="{{ url_for('new_connection') }}">
+      <button class="btn btn-dark btn-lg ms-5" type="button">Create new connection</button>
+    </a>
+  </div>
+
+
+  
+</form>
+
+
+
+</section>
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends "layout.html" %} {% block title %} Error{% endblock title %} {% block
+content %}
+<section>
+  <div class="container">
+    <div class="my-5">
+      <h1>File not found</h1>
+    </div>
+    <a href="{{ url_for('index') }}">Back</a>
+  </div>
+</section>
+{% endblock %}

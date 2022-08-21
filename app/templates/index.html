@@ -1,0 +1,79 @@
+{% set active_page = "index" %} {% extends "layout.html" %} {% block title
+%}Index{% endblock title %} {% block content %}
+<section>
+  <div class="container my-3">
+    <div class="row align-items-center justify-content-between">
+      <div class="col-md p-5">
+        <h1>Let's start right now!</h1>
+        <p class="lead">
+          Share important information with a selected person. Organize joint
+          activities and much more
+        </p>
+        <a href="{{ url_for('register') }}">
+          <button class="btn btn-primary btn-lg">Register</button>
+        </a>
+      </div>
+      <div class="col-md">
+        <img
+          src="{{ url_for('static', filename='img/img-start.svg') }}"
+          class="img-fluid"
+        />
+      </div>
+    </div>
+  </div>
+</section>
+<section class="bg-primary text-light py-5">
+  <div class="container">
+    <div class="d-sm-flex align-items-center">
+      <h3 class="mb-3 mb-md-0">Already have an account?</h3>
+      <a href="{{ url_for('login') }}">
+        <button class="btn btn-dark btn-lg ms-5" type="button">Log in</button>
+      </a>
+    </div>
+  </div>
+</section>
+<section class="p-5">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-md">
+        <div class="card bg-dark text-light h-100">
+          <div class="card-body text-center my-1">
+            <div class="h1 mb-3">
+              <i class="bi bi-globe"></i>
+            </div>
+            <h3 class="card-title mb-3">Connect</h3>
+            <p class="card-text">
+              Connect with the people you want to connect with. No one else.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md">
+        <div class="card bg-secondary text-light h-100">
+          <div class="card-body text-center">
+            <div class="h1 mb-3">
+              <i class="bi bi-people"></i>
+            </div>
+            <h3 class="card-title mb-3">Join us</h3>
+            <p class="card-text">Join us today. It's for free :-)</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md">
+        <div class="card bg-dark text-light h-100">
+          <div class="card-body text-center">
+            <div class="h1 mb-3">
+              <i class="bi bi-file-earmark-image"></i>
+            </div>
+            <h3 class="card-title mb-3">No ads</h3>
+            <p class="card-text">
+              Don't be distracted by advertisements. You will only see what you
+              want to see
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,67 @@
+{% set active_page = "notice_board" %} {% extends "layout.html" %} {% block
+title %}Notice Board{% endblock title %} {% block content %}
+<section>
+  <div class="container my-3">
+    <div class="d-flex">
+      <h1>NOTICE BOARD</h1>  
+      <div class="ms-auto">
+        <a href="/notice/add" class="btn btn-primary" href="">Create New Notice</a>
+
+      </div> 
+    </div>
+    {% if data %}
+    <div class="d-flex flex-wrap">
+      {% for sub_data in data %}
+    <div class="card m-2" style="width: 18rem">
+      <div class="card-body">
+        <div class="card-title">
+          <h5 >{{ sub_data.tasklist_text }}, ID: {{sub_data.tasklist_id}}</h5>
+          <a href="/notice/update/{{sub_data.tasklist_id}}"><button class="btn btn-primary btn-sm">Rename</button></a>
+          <a href="/notice/delete/{{sub_data.tasklist_id}}"><button class="btn btn-danger btn-sm">Delete</button></a>
+        </div>
+        <p class="card-text">
+          {% if sub_data.tasks %}
+          <ul>
+            {% for task in sub_data.tasks %}
+            <div class="d-flex">
+              <li class="me-1">{{ task.text }}</li>
+              <a href="/task/update/{{task.id}}" class="ms-auto" data-bs-toggle="popover" data-bs-content="Edit item"
+              data-bs-trigger="hover focus" data-bs-placement="top"><i class="bi bi-pencil"></i></a>
+                
+              </a>
+              <a href="/task/delete/{{task.id}}" class="ms-2" data-bs-toggle="popover" data-bs-content="Delete item"
+              data-bs-trigger="hover focus" data-bs-placement="top">
+                <i class="bi bi-trash"></i>                
+              </a>
+            </div>
+            {% endfor %}
+          </ul>
+          {% else %}
+          No items.
+          {% endif %}
+        </p>
+        <a href="/item/add/{{sub_data.tasklist_id}}" class="btn btn-primary">Add new item</a>
+      </div>
+    </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    No TASK to display.
+    {% endif %}
+  </div>
+</section>
+
+{% endblock %}
+
+
+{% block script %}
+<script>
+  console.log('zkouska spojeni INDOOR')
+  const popoverTriggerList = document.querySelectorAll(
+  '[data-bs-toggle="popover"]'
+);
+const popoverList = [...popoverTriggerList].map(
+  (popoverTriggerEl) => new bootstrap.Popover(popoverTriggerEl)
+);
+</script>
+{% endblock %}

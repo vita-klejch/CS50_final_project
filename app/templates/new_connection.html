@@ -1,0 +1,23 @@
+{% set active_page = "register" %} {% extends "layout.html" %} {% block title
+%}Connect{% endblock title %} {% block content %}
+<section class="container my-5">
+  <div class="my-3">
+    <h2>Make new connection.</h2>
+    If you want to connect with another user, you must enter their login name or
+    e-mail.
+  </div>
+  <form action="" method="post" novalidate>
+    {{ form.hidden_tag() }}
+    <div class="mb-3">
+      {{ form.user_to_connect(class="form-control mx-auto w-auto",
+      placeholder=form.user_to_connect.label.text) }} {% for error in
+      form.user_to_connect.errors %}
+      <div class="text-danger text-center">{{ error }}</div>
+      {% endfor %}
+    </div>
+    <div class="d-flex justify-content-center">
+      {{ form.submit(class="btn btn-primary px-5") }}
+    </div>
+  </form>
+</section>
+{% endblock %}
