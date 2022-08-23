@@ -2,9 +2,9 @@
 /venv
 /__pycache__
 /app/__pycache__
+/archive
 
 
 app.db
-config.py
 notes.txt
 

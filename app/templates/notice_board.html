@@ -5,8 +5,12 @@ title %}Notice Board{% endblock title %} {% block content %}
     <div class="d-flex">
       <h1>NOTICE BOARD</h1>  
       <div class="ms-auto">
-        <a href="/notice/add" class="btn btn-primary" href="">Create New Notice</a>
-
+        <!--
+          <a href="/notice/add" class="btn btn-primary" href="">Create New Notice</a>
+        -->
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createNoticeModal">
+          Create New Notice
+        </button>
       </div> 
     </div>
     {% if data %}
@@ -16,8 +20,15 @@ title %}Notice Board{% endblock title %} {% block content %}
       <div class="card-body">
         <div class="card-title">
           <h5 >{{ sub_data.tasklist_text }}, ID: {{sub_data.tasklist_id}}</h5>
-          <a href="/notice/update/{{sub_data.tasklist_id}}"><button class="btn btn-primary btn-sm">Rename</button></a>
-          <a href="/notice/delete/{{sub_data.tasklist_id}}"><button class="btn btn-danger btn-sm">Delete</button></a>
+          <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#updateNoticeModal" data-bs-id="{{sub_data.tasklist_id}}" data-bs-listtext="{{ sub_data.tasklist_text }}">
+            Rename
+          </button>
+          <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteNoticeModal" data-bs-id="{{sub_data.tasklist_id}}" data-bs-listtext="{{ sub_data.tasklist_text }}">
+            Delete
+          </button>          
+          <!-- OLD VERSION - no modal 
+            <a href="/notice/update/{{sub_data.tasklist_id}}"><button class="btn btn-primary btn-sm">Rename</button></a> 
+            <a href="/notice/delete/{{sub_data.tasklist_id}}"><button class="btn btn-danger btn-sm">Delete</button></a>  -->
         </div>
         <p class="card-text">
           {% if sub_data.tasks %}
@@ -25,10 +36,16 @@ title %}Notice Board{% endblock title %} {% block content %}
             {% for task in sub_data.tasks %}
             <div class="d-flex">
               <li class="me-1">{{ task.text }}</li>
-              <a href="/task/update/{{task.id}}" class="ms-auto" data-bs-toggle="popover" data-bs-content="Edit item"
-              data-bs-trigger="hover focus" data-bs-placement="top"><i class="bi bi-pencil"></i></a>
-                
-              </a>
+              <!-- OLD VRESION - no modal
+                <a href="/task/update/{{task.id}}" class="ms-auto" data-bs-toggle="popover" data-bs-content="Edit item"
+                data-bs-trigger="hover focus" data-bs-placement="top">
+                  <i class="bi bi-pencil"></i></a>
+                -->
+                <a type="button" class="ms-auto" data-bs-toggle="modal" 
+                data-bs-target="#updateTaskModal" data-bs-id="{{task.id}}" data-bs-text="{{ task.text }}">
+                  <i class="bi bi-pencil" data-bs-toggle="popover" data-bs-content="Edit item"
+                  data-bs-trigger="hover focus" data-bs-placement="top"></i>
+                </a>
               <a href="/task/delete/{{task.id}}" class="ms-2" data-bs-toggle="popover" data-bs-content="Delete item"
               data-bs-trigger="hover focus" data-bs-placement="top">
                 <i class="bi bi-trash"></i>                
@@ -40,7 +57,10 @@ title %}Notice Board{% endblock title %} {% block content %}
           No items.
           {% endif %}
         </p>
-        <a href="/item/add/{{sub_data.tasklist_id}}" class="btn btn-primary">Add new item</a>
+        <!-- stare tlacitko <a href="/item/add/{{sub_data.tasklist_id}}" class="btn btn-primary">Add new item</a>-->
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createTaskModal" data-bs-id="{{sub_data.tasklist_id}}">
+          Add new item
+        </button>
       </div>
     </div>
       {% endfor %}
@@ -51,11 +71,125 @@ title %}Notice Board{% endblock title %} {% block content %}
   </div>
 </section>
 
+<!-- MODALS starts here -->
+<!-- CREATE NEW NOTICE modal -->
+<div class="modal fade" id="createNoticeModal" tabindex="-1" aria-labelledby="createNoticeLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="createNoticeLabel">Enter a new name</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="createNoticeForm" method="post" novalidate action="{{ url_for('add_notice') }}">
+          {{ createNoticeForm.hidden_tag() }}
+          <div class="mb-3">
+            {{ createNoticeForm.text(class="form-control mx-auto w-auto") }}
+          </div>
+          <div class="d-flex justify-content-center">
+            {{ createNoticeForm.submit(class="btn btn-primary px-5") }}
+            <button type="button" class="btn btn-secondary ms-3" data-bs-dismiss="modal">Close</button>        
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- CREATE NEW TASK modal -->
+<div class="modal fade" id="createTaskModal" tabindex="-1" aria-labelledby="createTaskLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="createTaskLabel">Enter a new name</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="createTaskForm" method="post" action="" novalidate >
+          {{ createTaskForm.hidden_tag() }}
+          <div class="mb-3">
+            {{ createTaskForm.text(class="form-control mx-auto w-auto") }}
+          </div>
+          <div class="d-flex justify-content-center">
+            {{ createTaskForm.submit(class="btn btn-primary px-5") }}
+            <button type="button" class="btn btn-secondary ms-3" data-bs-dismiss="modal">Close</button>        
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- UPDATE/RENAME TASK modal -->
+<div class="modal fade" id="updateTaskModal" tabindex="-1" aria-labelledby="updateTaskLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="updateTaskLabel">Enter a new name</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="updateTaskForm" method="post" novalidate>
+          {{ changeTaskForm.hidden_tag() }}
+          <div class="mb-3">
+            {{ changeTaskForm.text(class="form-control mx-auto w-auto") }}
+          </div>
+          <div class="d-flex justify-content-center">
+            {{ changeTaskForm.submit(class="btn btn-primary px-5") }}
+            <button type="button" class="btn btn-secondary ms-3" data-bs-dismiss="modal">Close</button>        
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- UPDATE/RENAME NOTICE modal -->
+<div class="modal fade" id="updateNoticeModal" tabindex="-1" aria-labelledby="updateNoticeLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="updateNoticeLabel">Enter a new name</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="updateNoticeForm" method="post" novalidate>
+          {{ changeNoticeForm.hidden_tag() }}
+          <div class="mb-3">
+            {{ changeNoticeForm.text(class="form-control mx-auto w-auto") }}
+          </div>
+          <div class="d-flex justify-content-center">
+            {{ changeNoticeForm.submit(class="btn btn-primary px-5") }}
+            <button type="button" class="btn btn-secondary ms-3" data-bs-dismiss="modal">Close</button>        
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- DELETE NOTICE modal -->
+<div class="modal fade" id="deleteNoticeModal" tabindex="-1" aria-labelledby="deleteNoticeLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteNoticeLabel">Warning</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">  
+        <div class="mb-3">
+          Are you sure?
+        </div>
+        <div class="d-flex justify-content-center">
+          <a class="btn btn-danger px-5">Delete</a>
+          <button type="button" class="btn btn-secondary ms-3" data-bs-dismiss="modal">Close</button>        
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
 
 
 {% block script %}
 <script>
+  // POPOVER
   console.log('zkouska spojeni INDOOR')
   const popoverTriggerList = document.querySelectorAll(
   '[data-bs-toggle="popover"]'
@@ -63,5 +197,70 @@ title %}Notice Board{% endblock title %} {% block content %}
 const popoverList = [...popoverTriggerList].map(
   (popoverTriggerEl) => new bootstrap.Popover(popoverTriggerEl)
 );
+  // MODAL CONTROL
+  // CREATE NOTICE - MODAL CONTROL
+  // This modal works fine WITHOUT JS
+
+  // CREATE ITEM - MODAL CONTROL
+  const createTaskModal= document.getElementById('createTaskModal')
+  createTaskModal.addEventListener('show.bs.modal', event => {
+    const button = event.relatedTarget
+    // Extract info from data-bs-* attributes
+    // const text = button.getAttribute('data-bs-listtext')
+    const id = button.getAttribute('data-bs-id')
+    
+    const modalInput = createTaskModal.querySelector('.modal-body .mb-3 input')
+    const modalForm = createTaskModal.querySelector('.modal-body form')
+    console.log(modalForm)
+
+    modalForm.setAttribute('action', `/task/add/${id}`)
+    // modalInput.value = text
+  })
+
+  // UPDATE NOTICE - MODAL CONTROL
+  const updateNoticeModal= document.getElementById('updateNoticeModal')
+  updateNoticeModal.addEventListener('show.bs.modal', event => {
+    const button = event.relatedTarget
+    // Extract info from data-bs-* attributes
+    const text = button.getAttribute('data-bs-listtext')
+    const id = button.getAttribute('data-bs-id')
+    
+    const modalInput = updateNoticeModal.querySelector('.modal-body .mb-3 input')
+    const modalForm = updateNoticeModal.querySelector('.modal-body form')
+
+    modalForm.setAttribute('action', `/notice/update/${id}`)
+    modalInput.value = text
+  })
+
+  // UPDATE TASK - MODAL CONTROL
+  const updateTaskModal= document.getElementById('updateTaskModal')
+  updateTaskModal.addEventListener('show.bs.modal', event => {
+    const button = event.relatedTarget
+    // Extract info from data-bs-* attributes
+    const text = button.getAttribute('data-bs-text')
+    const id = button.getAttribute('data-bs-id')
+    
+    const modalInput = updateTaskModal.querySelector('.modal-body .mb-3 input')
+    const modalForm = updateTaskModal.querySelector('.modal-body form')
+
+    modalForm.setAttribute('action', `/task/update/${id}`)
+    modalInput.value = text
+  })
+
+  // DELETE NOTICE - MODAL CONTROL
+  const deleteNoticeModal= document.getElementById('deleteNoticeModal')
+  deleteNoticeModal.addEventListener('show.bs.modal', event => {
+    const button = event.relatedTarget
+    // Extract info from data-bs-* attributes
+    const text = button.getAttribute('data-bs-listtext')
+    const id = button.getAttribute('data-bs-id')
+    
+    const modalLink = deleteNoticeModal.querySelector('.modal-body a')
+    const modalBody = deleteNoticeModal.querySelector('.modal-body .mb-3')
+
+    modalLink.setAttribute('href', `/notice/delete/${id}`)
+    modalBody.innerText = `Are you sure you want to delete the note "${text}"?`
+  })
+
 </script>
 {% endblock %}
