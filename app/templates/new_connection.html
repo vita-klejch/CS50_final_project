@@ -11,7 +11,7 @@
     <div class="mb-3">
       {{ form.user_to_connect(class="form-control mx-auto w-auto",
       placeholder=form.user_to_connect.label.text) }} {% for error in
-      form.user_to_connect.errors %}
+      form.text.errors %}
       <div class="text-danger text-center">{{ error }}</div>
       {% endfor %}
     </div>

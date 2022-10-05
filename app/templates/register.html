@@ -5,23 +5,30 @@
     {{ form.hidden_tag() }}
     <div class="mb-3">
       {{ form.username(class="form-control mx-auto w-auto",
-      placeholder=form.username.label.text) }} {% for error in
-      form.username.errors %}
-      <div class="text-danger text-center">{{ error }}</div>
+      placeholder=form.username.label.text) }}
+      {% for error in form.username.errors %}
+      <div class="text-danger text-center">
+        {{ error }}
+      </div>
       {% endfor %}
     </div>
 
     <div class="mb-3">
       {{ form.email(class="form-control mx-auto w-auto",
-      placeholder=form.email.label.text) }} {% for error in form.email.errors %}
-      <div class="text-danger text-center">{{ error }}</div>
+      placeholder=form.email.label.text) }} 
+      {% for error in form.email.errors %}
+      <div class="text-danger text-center">
+        {{ error }}
+      </div>
       {% endfor %}
     </div>
     <div class="mb-3">
       {{ form.password(class="form-control mx-auto w-auto",
-      placeholder=form.password.label.text) }} {% for error in
-      form.password.errors %}
-      <div class="text-danger text-center">{{ error }}</div>
+      placeholder=form.password.label.text) }}
+      {% for error in form.password.errors %}
+      <div class="text-danger text-center">
+        {{ error }}
+      </div>
       {% endfor %}
     </div>
     <div class="mb-3">

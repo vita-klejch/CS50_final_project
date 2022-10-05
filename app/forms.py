@@ -27,9 +27,9 @@ class RegisterForm(FlaskForm):
         if user is not None:
             raise ValidationError('Please use a different email address.')
 
-class ConnectForm(FlaskForm):
-    user_to_connect = StringField('Username OR e-mail', validators=[DataRequired()])
-    submit = SubmitField('Sign In')
+class newConnectionForm(FlaskForm):
+    user_to_connect = StringField('e-mail', validators=[DataRequired()])
+    submit = SubmitField('Connect with user')
 
 class NewNoticeForm(FlaskForm):
     text = StringField('Title', validators=[DataRequired()])

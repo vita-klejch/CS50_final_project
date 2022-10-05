@@ -5,71 +5,117 @@ title %}Notice Board{% endblock title %} {% block content %}
     <div class="d-flex">
       <h1>NOTICE BOARD</h1>  
       <div class="ms-auto">
-        <!--
-          <a href="/notice/add" class="btn btn-primary" href="">Create New Notice</a>
-        -->
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createNoticeModal">
           Create New Notice
         </button>
       </div> 
     </div>
     {% if data %}
-    <div class="d-flex flex-wrap">
-      {% for sub_data in data %}
-    <div class="card m-2" style="width: 18rem">
-      <div class="card-body">
-        <div class="card-title">
-          <h5 >{{ sub_data.tasklist_text }}, ID: {{sub_data.tasklist_id}}</h5>
-          <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#updateNoticeModal" data-bs-id="{{sub_data.tasklist_id}}" data-bs-listtext="{{ sub_data.tasklist_text }}">
-            Rename
-          </button>
-          <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteNoticeModal" data-bs-id="{{sub_data.tasklist_id}}" data-bs-listtext="{{ sub_data.tasklist_text }}">
-            Delete
-          </button>          
-          <!-- OLD VERSION - no modal 
-            <a href="/notice/update/{{sub_data.tasklist_id}}"><button class="btn btn-primary btn-sm">Rename</button></a> 
-            <a href="/notice/delete/{{sub_data.tasklist_id}}"><button class="btn btn-danger btn-sm">Delete</button></a>  -->
-        </div>
-        <p class="card-text">
-          {% if sub_data.tasks %}
-          <ul>
-            {% for task in sub_data.tasks %}
-            <div class="d-flex">
-              <li class="me-1">{{ task.text }}</li>
-              <!-- OLD VRESION - no modal
-                <a href="/task/update/{{task.id}}" class="ms-auto" data-bs-toggle="popover" data-bs-content="Edit item"
-                data-bs-trigger="hover focus" data-bs-placement="top">
-                  <i class="bi bi-pencil"></i></a>
-                -->
-                <a type="button" class="ms-auto" data-bs-toggle="modal" 
-                data-bs-target="#updateTaskModal" data-bs-id="{{task.id}}" data-bs-text="{{ task.text }}">
-                  <i class="bi bi-pencil" data-bs-toggle="popover" data-bs-content="Edit item"
-                  data-bs-trigger="hover focus" data-bs-placement="top"></i>
-                </a>
-              <a href="/task/delete/{{task.id}}" class="ms-2" data-bs-toggle="popover" data-bs-content="Delete item"
-              data-bs-trigger="hover focus" data-bs-placement="top">
-                <i class="bi bi-trash"></i>                
-              </a>
+      <div class="d-flex flex-wrap">
+        <!-- LOOP users data and DISPLAY them -->
+        {% for sub_data in data %}
+          <div class="card m-2" style="width: 18rem">
+            <div class="card-body">
+              <div class="card-title">
+                <h5 >{{ sub_data.tasklist_text }}</h5>          
+                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#updateNoticeModal" data-bs-id="{{sub_data.tasklist_id}}" data-bs-listtext="{{ sub_data.tasklist_text }}">
+                  Rename
+                </button>
+                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteNoticeModal" data-bs-id="{{sub_data.tasklist_id}}" data-bs-listtext="{{ sub_data.tasklist_text }}">
+                  Delete
+                </button>
+                {% if share_data.enable_sharing %}
+                  {% if sub_data.is_shared %}
+                    <a href="/notice/toggle_share/{{ sub_data.tasklist_id }}" class="btn btn-sm btn-secondary"
+                    data-bs-toggle="popover" data-bs-content="Disable sharing with user {{ share_data.connection_name }}"
+                    data-bs-trigger="hover focus" data-bs-placement="top">
+                      Disable sharing
+                    </a>
+                  {% else %}
+                    <a href="/notice/toggle_share/{{ sub_data.tasklist_id }}" class="btn btn-sm btn-secondary"
+                    data-bs-toggle="popover" data-bs-content="Enable sharing with user {{ share_data.connection_name }}"
+                    data-bs-trigger="hover focus" data-bs-placement="top">
+                      Enable sharing
+                    </a>
+                  {% endif %}
+                {% endif %}
+              </div>
+              <p class="card-text">
+                {% if sub_data.tasks %}
+                <ul>
+                  {% for task in sub_data.tasks %}
+                  <div class="d-flex">
+                    <li class="me-1">{{ task.text }}</li>
+                      <a type="button" class="ms-auto" data-bs-toggle="modal" 
+                      data-bs-target="#updateTaskModal" data-bs-id="{{task.id}}" data-bs-text="{{ task.text }}">
+                        <i class="bi bi-pencil" data-bs-toggle="popover" data-bs-content="Edit item"
+                        data-bs-trigger="hover focus" data-bs-placement="top"></i>
+                      </a>
+                      <a href="/task/delete/{{task.id}}" class="ms-2" data-bs-toggle="popover" data-bs-content="Delete item"
+                      data-bs-trigger="hover focus" data-bs-placement="top">
+                        <i class="bi bi-trash"></i>                
+                      </a>
+                    </div>
+                  {% endfor %}
+                </ul>
+                {% else %}
+                No items.
+                {% endif %}
+              </p>
+              <button type="button" class="btn btn-primary" data-bs-toggle="modal" 
+              data-bs-target="#createTaskModal" data-bs-id="{{sub_data.tasklist_id}}">
+                Add new item
+              </button>        
             </div>
-            {% endfor %}
-          </ul>
-          {% else %}
-          No items.
-          {% endif %}
-        </p>
-        <!-- stare tlacitko <a href="/item/add/{{sub_data.tasklist_id}}" class="btn btn-primary">Add new item</a>-->
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createTaskModal" data-bs-id="{{sub_data.tasklist_id}}">
-          Add new item
-        </button>
+          </div>
+        {% endfor %}
       </div>
-    </div>
-      {% endfor %}
-    </div>
-    {% else %}
-    No TASK to display.
     {% endif %}
-  </div>
-</section>
+    <!-- SHARE DATA SECTION STARTS HERE -->
+    {% if share_data.enable_sharing %}
+      <div class="container my-3">
+        <!-- LOOP data SHARED by user's CONNECTION and DISPLAY them -->
+        <h1>Notices shared with user {{ share_data.connection_name }}</h1> 
+        <div class="d-flex">
+          {% for sub_data in share_data.data %}
+          <div class="card m-2" style="width: 18rem">
+            <div class="card-body">
+              <div class="card-title">
+                <h5 >{{ sub_data.tasklist_text }}</h5>          
+              </div>
+              <p class="card-text">
+                {% if sub_data.tasks %}
+                <ul>
+                  {% for task in sub_data.tasks %}
+                  <div class="d-flex">
+                    <li class="me-1">{{ task.text }}</li>
+                    <a type="button" class="ms-auto" data-bs-toggle="modal" 
+                    data-bs-target="#updateTaskModal" data-bs-id="{{task.id}}" data-bs-text="{{ task.text }}">
+                      <i class="bi bi-pencil" data-bs-toggle="popover" data-bs-content="Edit item"
+                      data-bs-trigger="hover focus" data-bs-placement="top"></i>
+                    </a>
+                    <a href="/task/delete/{{task.id}}" class="ms-2" data-bs-toggle="popover" data-bs-content="Delete item"
+                    data-bs-trigger="hover focus" data-bs-placement="top">
+                      <i class="bi bi-trash"></i>                
+                    </a>
+                  </div>
+                  {% endfor %}
+                </ul>
+                {% else %}
+                No items.
+                {% endif %}
+              </p>
+              <button type="button" class="btn btn-primary" data-bs-toggle="modal" 
+              data-bs-target="#createTaskModal" data-bs-id="{{sub_data.tasklist_id}}">
+                Add new item
+              </button>        
+            </div>
+          </div>
+          {% endfor %}        
+        </div>
+      </div>
+    {% endif %}
+  </section>
 
 <!-- MODALS starts here -->
 <!-- CREATE NEW NOTICE modal -->

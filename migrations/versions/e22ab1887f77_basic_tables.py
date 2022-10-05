@@ -1,8 +1,8 @@
-"""users table
+"""basic tables
 
-Revision ID: 1d3fbcc49ebe
+Revision ID: e22ab1887f77
 Revises: 
-Create Date: 2022-08-21 10:31:26.273831
+Create Date: 2022-08-25 18:03:10.984679
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '1d3fbcc49ebe'
+revision = 'e22ab1887f77'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -23,15 +23,24 @@ def upgrade():
     sa.Column('username', sa.String(length=64), nullable=True),
     sa.Column('email', sa.String(length=120), nullable=True),
     sa.Column('password_hash', sa.String(length=128), nullable=True),
+    sa.Column('is_connected', sa.Integer(), nullable=True),
+    sa.Column('connected_with', sa.Integer(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_users_email'), 'users', ['email'], unique=True)
     op.create_index(op.f('ix_users_username'), 'users', ['username'], unique=True)
+    op.create_table('connectionRequests',
+    sa.Column('requesting_id', sa.Integer(), nullable=True),
+    sa.Column('requested_id', sa.Integer(), nullable=True),
+    sa.ForeignKeyConstraint(['requested_id'], ['users.id'], ),
+    sa.ForeignKeyConstraint(['requesting_id'], ['users.id'], )
+    )
     op.create_table('tasklists_table',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('text', sa.String(length=140), nullable=True),
     sa.Column('timestamp', sa.DateTime(), nullable=True),
     sa.Column('user_id', sa.Integer(), nullable=True),
+    sa.Column('is_shared', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -56,6 +65,7 @@ def downgrade():
     op.drop_table('task')
     op.drop_index(op.f('ix_tasklists_table_timestamp'), table_name='tasklists_table')
     op.drop_table('tasklists_table')
+    op.drop_table('connectionRequests')
     op.drop_index(op.f('ix_users_username'), table_name='users')
     op.drop_index(op.f('ix_users_email'), table_name='users')
     op.drop_table('users')

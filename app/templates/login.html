@@ -6,10 +6,20 @@
     <div class="mb-3">
       {{ form.username(class="form-control mx-auto w-auto",
       placeholder=form.username.label.text) }}
+      {% for error in form.username.errors %}
+      <div class="text-danger text-center">
+        {{ error }}
+      </div>
+      {% endfor %}
     </div>
     <div class="mb-3">
       {{ form.password(class="form-control mx-auto w-auto",
       placeholder=form.password.label.text) }}
+      {% for error in form.password.errors %}
+      <div class="text-danger text-center">
+        {{ error }}
+      </div>
+      {% endfor %}
     </div>
     <div class="mb-3 d-flex justify-content-center">
       {{ form.remember_me(class="me-2") }} {{ form.remember_me.label }}

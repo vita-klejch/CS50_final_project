@@ -3,6 +3,10 @@ from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 
+connectionRequests = db.Table('connectionRequests',
+    db.Column('requesting_id', db.Integer, db.ForeignKey('users.id')),
+    db.Column('requested_id', db.Integer, db.ForeignKey('users.id'))
+)
 
 @login.user_loader
 def load_user(id):
@@ -14,8 +18,18 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(64), index=True, unique=True)
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(128))
+    is_connected = db.Column(db.Integer, default=0)
+    connected_with = db.Column(db.Integer)
+
     task_lists = db.relationship('TaskList', backref='owner', lazy='dynamic')
     tasks = db.relationship('Task', backref='owner', lazy='dynamic')
+    # connections = db.relationship('ConnectionRequest', backref='owner', lazy='dynamic')
+
+    requested = db.relationship(
+        'User', secondary=connectionRequests,
+        primaryjoin=(connectionRequests.c.requesting_id == id),
+        secondaryjoin=(connectionRequests.c.requested_id == id),
+        backref=db.backref('connectionRequests', lazy='dynamic'), lazy='dynamic')
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
@@ -32,6 +46,8 @@ class TaskList(db.Model):
     text = db.Column(db.String(140))
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    is_shared = db.Column(db.Integer, default=0)
+
     task_lists = db.relationship('Task', backref='tasks_tasklist', lazy='dynamic')
     
     def __repr__(self):
@@ -46,3 +62,15 @@ class Task(db.Model):
 
     def __repr__(self):
         return '<Task: {}, tasklist_id: {}>'.format(self.text, self.tasklist_id)
+
+# --helper table to keep track about pending request to connect--
+# if user wants to connect with somebody, he makes a request and
+# another user have to decline or accept the request
+# class ConnectionRequest(db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     id_requesting = db.Column(db.Integer, db.ForeignKey('users.id'))
+#     id_requested = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+#     def __repr__(self):
+#         return '<ConnectionRequest - id_requesting: {}, id_requested: {}>'.format(self.id_requesting, self.id_requested)
+

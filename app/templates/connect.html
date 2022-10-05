@@ -1,25 +1,350 @@
 {% set active_page = "connect" %} {% extends "layout.html" %} {% block title
 %}Connect{% endblock title %} {% block content %}
 <section class="container my-5">
-  <div>
-    <div class="d-sm-flex align-items-center">
-      <h3 class="mb-3 mb-md-0">Your connections:</h3>
-    </div>
-    <ul>
-      <li>jméno</li>
-      <li>jméno</li>
-      <li>jméno</li>
-    </ul>
-    <a href="{{ url_for('new_connection') }}">
-      <button class="btn btn-dark btn-lg ms-5" type="button">Create new connection</button>
-    </a>
+  {% if connect_data.is_connected %}
+  <div class="my-3">
+    You are connected with user
+    <span class="fw-bold">{{ connect_data.connected_with }}</span>.
   </div>
+  <div class="my-3">
+    You can share your Notice Board if you want. To do it you have to mark your
+    Notice as "shared".
+  </div>
+  <div class="my-3">
+    If you change your mind and don't want to be connected with user
+    {{connect_data.connected_with}}, you can delete this connection. All shared
+    Notices will be only yours.
+  </div>
+  <div class="my-3">
+    <button
+      class="btn btn-danger btn-lg ms-5"
+      type="button"
+      data-bs-toggle="modal"
+      data-bs-target="#deleteConnection"
+    >
+      Delete your connection
+    </button>
+  </div>
+  <!-- DELETE SENT REQUEST modal -->
+  <div
+    class="modal fade"
+    id="deleteConnection"
+    tabindex="-1"
+    aria-labelledby="deleteConnection"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteConnection">Warning</h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            Are you sure you want to delete connection with user {{
+            connect_data.connected_with }}?
+          </div>
+          <div class="d-flex justify-content-center">
+            <a class="btn btn-danger px-5" href="/delete_connection">Delete</a>
+            <button
+              type="button"
+              class="btn btn-secondary ms-3"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div class="my-3">user is NOT connected</div>
 
-
-  
-</form>
-
-
-
+  <div>
+    <div class="d-sm-flex align-items-center"></div>
+    <button
+      class="btn btn-dark btn-lg ms-5"
+      type="button"
+      data-bs-toggle="modal"
+      data-bs-target="#newConnectionModal"
+    >
+      Create new connection
+    </button>
+  </div>
+  <div class="my-5">
+    <h4>Recieved requests to connect:</h4>
+    {% if requests_recieved_data %}
+    <ul>
+      {% for single_requests in requests_recieved_data %}
+      <li class="my-2">
+        User "{{ single_requests.name }}" wants to connect with you.
+        <button
+          type="button"
+          class="btn btn-success btn-sm ms-5"
+          data-bs-toggle="modal"
+          data-bs-target="#acceptRequest"
+          data-bs-id="{{ single_requests.id }}"
+          data-bs-name="{{ single_requests.name }}"
+        >
+          Accept
+        </button>
+        <button
+          type="button"
+          class="btn btn-danger btn-sm"
+          data-bs-toggle="modal"
+          data-bs-target="#rejectRequest"
+          data-bs-id="{{ single_requests.id }}"
+          data-bs-name="{{ single_requests.name }}"
+        >
+          Reject
+        </button>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %} No data to display. {% endif %}
+  </div>
+  <div class="my-5">
+    <h4>Sent requests to connect:</h4>
+    {% if requests_sent_data %}
+    <ul>
+      {% for single_requests in requests_sent_data %}
+      <li class="my-2">
+        You have sent a request to "{{ single_requests.name }}"
+        <button
+          type="button"
+          class="btn btn-danger btn-sm ms-5"
+          data-bs-toggle="modal"
+          data-bs-target="#deleteSentRequest"
+          data-bs-id="{{ single_requests.id }}"
+          data-bs-name="{{ single_requests.name }}"
+        >
+          Delete request
+        </button>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %} No data to display. {% endif %}
+  </div>
 </section>
-{% endblock %}
+
+<!-- MODALS starts here -->
+<!-- CREATE NEW CONNECTION modal -->
+<div
+  class="modal fade"
+  id="newConnectionModal"
+  tabindex="-1"
+  aria-labelledby="newConnectionLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="newConnectionLabel">
+          Create new connection
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="my-3">
+          Enter the email of the user you want to connect with.
+        </div>
+        <form
+          id="newConnectionForm"
+          method="post"
+          novalidate
+          action="{{ url_for('new_connection') }}"
+        >
+          {{ newConnectionForm.hidden_tag() }}
+          <div class="mb-3">
+            {{ newConnectionForm.user_to_connect(class="form-control mx-auto
+            w-auto") }}
+          </div>
+          <div class="d-flex justify-content-center">
+            {{ newConnectionForm.submit(class="btn btn-primary px-5") }}
+            <button
+              type="button"
+              class="btn btn-secondary ms-3"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE SENT REQUEST modal -->
+<div
+  class="modal fade"
+  id="deleteSentRequest"
+  tabindex="-1"
+  aria-labelledby="deleteSentRequest"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteSentRequest">Warning</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">Are you sure?</div>
+        <div class="d-flex justify-content-center">
+          <a class="btn btn-danger px-5">Delete</a>
+          <button
+            type="button"
+            class="btn btn-secondary ms-3"
+            data-bs-dismiss="modal"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- REJECT REQUEST (recieved) modal -->
+<div
+  class="modal fade"
+  id="rejectRequest"
+  tabindex="-1"
+  aria-labelledby="rejectRequest"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="rejectRequest">Warning</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">Are you sure?</div>
+        <div class="d-flex justify-content-center">
+          <a class="btn btn-danger px-5">Reject</a>
+          <button
+            type="button"
+            class="btn btn-secondary ms-3"
+            data-bs-dismiss="modal"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ACCEPT REQUEST (recieved) modal -->
+<div
+  class="modal fade"
+  id="acceptRequest"
+  tabindex="-1"
+  aria-labelledby="acceptRequest"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="acceptRequest">Accept connection</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">Are you sure?</div>
+        <div class="d-flex justify-content-center">
+          <a class="btn btn-success px-5">Accept</a>
+          <button
+            type="button"
+            class="btn btn-secondary ms-3"
+            data-bs-dismiss="modal"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %} {% endblock %} {% block script %} {% if connect_data.is_connected %}
+<script>
+  console.log("CONNECT INFO: user is conencted");
+</script>
+{% else %}
+<script>
+  console.log("CONNECT INFO: user is not connected");
+
+  // MODAL CONTROL
+
+  // DELETE SENT REQUEST - MODAL CONTROL
+  const deleteSentRequest = document.getElementById("deleteSentRequest");
+  deleteSentRequest.addEventListener("show.bs.modal", (event) => {
+    const button = event.relatedTarget;
+    // Extract info from data-bs-* attributes
+    const name = button.getAttribute("data-bs-name");
+    const id = button.getAttribute("data-bs-id");
+
+    const modalLink = deleteSentRequest.querySelector(".modal-body a");
+    const modalBody = deleteSentRequest.querySelector(".modal-body .mb-3");
+
+    modalLink.setAttribute("href", `/request/delete/${id}`);
+    modalBody.innerText = `Are you sure you want to delete request sent to user ${name}?`;
+  });
+
+  // REJECT RECIEVED REQUEST - MODAL CONTROL
+  const rejectRequest = document.getElementById("rejectRequest");
+  rejectRequest.addEventListener("show.bs.modal", (event) => {
+    const button = event.relatedTarget;
+    // Extract info from data-bs-* attributes
+    const name = button.getAttribute("data-bs-name");
+    const id = button.getAttribute("data-bs-id");
+
+    const modalLink = rejectRequest.querySelector(".modal-body a");
+    const modalBody = rejectRequest.querySelector(".modal-body .mb-3");
+
+    modalLink.setAttribute("href", `/request/reject/${id}`);
+    modalBody.innerText = `Are you sure you want to reject request from user ${name}?`;
+  });
+
+  // ACCEPT RECIEVED REQUEST - MODAL CONTROL
+  const acceptRequest = document.getElementById("acceptRequest");
+  acceptRequest.addEventListener("show.bs.modal", (event) => {
+    const button = event.relatedTarget;
+    // Extract info from data-bs-* attributes
+    const name = button.getAttribute("data-bs-name");
+    const id = button.getAttribute("data-bs-id");
+
+    const modalLink = acceptRequest.querySelector(".modal-body a");
+    const modalBody = acceptRequest.querySelector(".modal-body .mb-3");
+
+    modalLink.setAttribute("href", `/request/accept/${id}`);
+    modalBody.innerText = `Are you sure you want to connect with user ${name}?`;
+  });
+</script>
+{% endif %} {% endblock %}
