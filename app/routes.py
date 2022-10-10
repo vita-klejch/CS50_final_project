@@ -1,4 +1,3 @@
-from this import d
 from app import app, db
 from flask import render_template, session, redirect, flash, url_for, request
 from helper import login_required
